@@ -1,11 +1,15 @@
 package com.fasterxml.jackson.databind.deser;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.json.JsonReadContext;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.impl.*;
+import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import com.fasterxml.jackson.databind.util.NameTransformer;
 import com.fasterxml.jackson.databind.util.TokenBuffer;
 
@@ -254,8 +258,8 @@ public class BeanDeserializer
             do {
                 p.nextToken();
                 SettableBeanProperty prop = _beanProperties.find(propName);
-
-                if (prop != null) { // normal case
+                
+                if (prop != null && !isPropertyIgnored(propName)) { // normal case
                     try {
                         prop.deserializeAndSet(p, ctxt, bean);
                     } catch (Exception e) {
@@ -268,6 +272,14 @@ public class BeanDeserializer
         }
         return bean;
     }
+    
+	private boolean isPropertyIgnored(String propName) {
+		if (_ignorableProps != null && _ignorableProps.contains(propName)) {
+			return true;
+		}
+
+		return false;
+	}
 
     /**
      * General version used when handling needs more advanced features.
