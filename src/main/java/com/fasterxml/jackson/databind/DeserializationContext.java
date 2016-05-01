@@ -139,6 +139,8 @@ public abstract class DeserializationContext
      */
     protected LinkedNode<JavaType> _currentType;
     
+    protected BeanProperty _beanProperty;
+    
     /*
     /**********************************************************
     /* Life-cycle
@@ -269,6 +271,14 @@ public abstract class DeserializationContext
         return _config.getTimeZone();
     }
 
+    public BeanProperty getBeanProperty() {
+    	return _beanProperty;
+    }
+    
+    public void setBeanProperty(BeanProperty beanProperty) {
+    	_beanProperty = beanProperty;
+    }
+    
     /*
     /**********************************************************
     /* Access to per-call state, like generic attributes (2.3+)
@@ -441,6 +451,7 @@ public abstract class DeserializationContext
     public final JsonDeserializer<Object> findContextualValueDeserializer(JavaType type,
             BeanProperty prop) throws JsonMappingException
     {
+    	this._beanProperty = prop;
         JsonDeserializer<Object> deser = _cache.findValueDeserializer(this, _factory, type);
         if (deser != null) {
             deser = (JsonDeserializer<Object>) handleSecondaryContextualization(deser, prop, type);

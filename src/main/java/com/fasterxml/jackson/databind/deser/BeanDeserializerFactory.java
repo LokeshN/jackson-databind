@@ -459,7 +459,18 @@ public class BeanDeserializerFactory
             }
         }
         // Or explicit/implicit definitions?
-        Set<String> ignored = ArrayBuilders.arrayToSet(intr.findPropertiesToIgnore(beanDesc.getClassInfo(), false));        
+        Set<String> ignored = ArrayBuilders.arrayToSet(intr.findPropertiesToIgnore(beanDesc.getClassInfo(), false));
+        //add to the existing ignored fields
+        if(ctxt.getBeanProperty() != null) {
+        	Set<String> ignoredFields =  ArrayBuilders.arrayToSet(intr.findPropertiesToIgnoreForField(ctxt.getBeanProperty()));
+        	if(ignored != null) {
+        		ignored.addAll(ignoredFields); 
+        	}
+        	else {
+        		ignored = ignoredFields;
+        	}
+        }
+        
         for (String propName : ignored) {
             builder.addIgnorable(propName);
         }

@@ -1,10 +1,12 @@
 package com.fasterxml.jackson.databind;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.Version;
@@ -252,7 +254,12 @@ public abstract class AnnotationIntrospector
      * Method for checking whether an annotation indicates that all unknown properties
      */
     public Boolean findIgnoreUnknownProperties(AnnotatedClass ac) { return null; }
-
+    
+    /**
+     * Method for checking whether an annotation is present on a field
+     */
+    public String[] findPropertiesToIgnoreForField(BeanProperty beanProperty) { return null; }
+    
     /**
      * Method for checking whether properties that have specified type
      * (class, not generics aware) should be completely ignored for
@@ -1362,6 +1369,16 @@ public abstract class AnnotationIntrospector
     /**********************************************************
      */
 
+    /**
+     * Method to return the annotation on the class field
+     * 
+     * @since 2.8
+     */
+    protected <A extends Annotation> A _findAnnotationOnField(BeanProperty beanProperty,
+            Class<A> annoClass) {
+        return beanProperty.getAnnotation(annoClass);
+    }
+    
     /**
      * Method that should be used by sub-classes for ALL
      * annotation access;

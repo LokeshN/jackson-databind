@@ -37,6 +37,21 @@ public class TestAnnotationIgnore
         public int y = 1;
     }
     
+    final static class IgnoreObject {
+    	public int x;
+    	
+    	public int y = 2;
+    }
+    
+    final static class TestIgnoreObject {
+    	
+    	@JsonIgnoreProperties({"x"})
+    	public IgnoreObject obj; 
+    	
+    	@JsonIgnoreProperties({"y"})
+    	public IgnoreObject obj1; 
+    }
+    
     /*
     /**********************************************************
     /* Test methods
@@ -80,5 +95,16 @@ public class TestAnnotationIgnore
         } catch (JsonMappingException e) {
             verifyException(e, "Ignored field");
         }
+    }
+    
+    public void testObjectPropertyIgnore() throws Exception {
+    	
+        TestIgnoreObject result = MAPPER.readValue(aposToQuotes("{'obj':{'x': 10, 'y': 20}, 'obj1':{'x': 10, 'y': 20}}"),
+                		TestIgnoreObject.class);
+        assertEquals(0, result.obj.x);
+        assertEquals(20, result.obj.y);	
+        assertEquals(0, result.obj1.y);
+        
+        
     }
 }

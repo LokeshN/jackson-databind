@@ -131,6 +131,10 @@ public final class AnnotatedField
      */
     public boolean isTransient() { return Modifier.isTransient(getModifiers()); }
     
+    public boolean isAnnotatedWith(Class cls) {
+    	return _field.isAnnotationPresent(cls);
+    }
+    
     @Override
     public int hashCode() {
         return _field.getName().hashCode();

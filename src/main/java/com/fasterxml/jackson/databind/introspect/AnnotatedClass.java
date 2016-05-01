@@ -247,6 +247,11 @@ public final class AnnotatedClass
     public <A extends Annotation> A getAnnotation(Class<A> acls) {
         return _classAnnotations().get(acls);
     }
+    
+    public <A extends Annotation> A getAnnotationFields(Class<A> acls) {
+        //return _fields.;
+    	return null;
+    }
 
     @Override
     public boolean hasAnnotation(Class<?> acls) {

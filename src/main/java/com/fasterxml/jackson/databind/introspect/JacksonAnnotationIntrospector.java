@@ -247,6 +247,11 @@ public class JacksonAnnotationIntrospector
         return ignore.value();
     }
     
+    public String[] findPropertiesToIgnoreForField(BeanProperty beanProperty) {
+    	JsonIgnoreProperties ignoreProperties = _findAnnotationOnField(beanProperty, JsonIgnoreProperties.class);
+    	return ignoreProperties.value();
+    }
+    
     @Override
     public Boolean findIgnoreUnknownProperties(AnnotatedClass ac) {
         JsonIgnoreProperties ignore = _findAnnotation(ac, JsonIgnoreProperties.class);
