@@ -164,6 +164,8 @@ public abstract class BeanDescription
      * Object; second any can be any type.
      */
     public abstract AnnotatedMethod findAnySetter();
+    
+    public abstract AnnotatedMember findAnySetterField();
 
     /**
      * Method for locating the getter method that is annotated with

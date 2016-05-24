@@ -17,6 +17,26 @@ public class IgnorePropsForSerTest
         public int getC() { return -6; }
         public String getD() { return "abc"; }
     }
+    
+    static class IgnoreSetterObj {
+    	 public int x = 3;
+         public String y= "test";
+    }
+    
+    static class IgnorePropertiesInSetter
+    {
+        public int a = 3;
+        public String b = "x";
+		public IgnoreSetterObj ignoreObj;
+		
+		@JsonIgnoreProperties("x")
+		public void setIgnoreObj(IgnoreSetterObj ignoreObj) {
+			this.ignoreObj = ignoreObj;
+		}
+		
+    }
+    
+    
 
     @SuppressWarnings("serial")
     @JsonIgnoreProperties({"@class"})
@@ -128,5 +148,16 @@ public class IgnorePropsForSerTest
         mapper.configOverride(Point.class)
             .setIgnorals(JsonIgnoreProperties.Value.forIgnoredProperties("x"));
         assertEquals("{\"y\":3}", mapper.writeValueAsString(new Point(2, 3)));
+    }
+    
+    public void testIgnorePropertiesInSetter() throws Exception {
+    	 IgnorePropertiesInSetter ignorePropsInSetter = new IgnorePropertiesInSetter();
+    	 ignorePropsInSetter.a = 10;
+    	 ignorePropsInSetter.b = "test";
+    	 ignorePropsInSetter.ignoreObj = new IgnoreSetterObj();
+    	 
+    	 String val = MAPPER.writeValueAsString(ignorePropsInSetter);
+    			 
+    	 System.out.println(val);		 
     }
 }

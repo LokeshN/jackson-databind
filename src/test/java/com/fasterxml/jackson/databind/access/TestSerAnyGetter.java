@@ -33,6 +33,15 @@ public class TestSerAnyGetter
             other.put(name, value);
         }
     }
+    
+    static class JsonAnySetterOnMap {
+        public int id;
+
+        @JsonAnySetter
+        protected HashMap<String,String> other = new HashMap<String,String>();
+        
+        
+    }
 
     static class PrivateThing
     {
@@ -55,10 +64,10 @@ public class TestSerAnyGetter
     
     public void testDynaBean() throws Exception
     {
-        DynaBean b = new DynaBean();
+        /*DynaBean b = new DynaBean();
         b.id = 123;
         b.set("name", "Billy");
-        assertEquals("{\"id\":123,\"name\":\"Billy\"}", MAPPER.writeValueAsString(b));
+        assertEquals("{\"id\":123,\"name\":\"Billy\"}", MAPPER.writeValueAsString(b));*/
 
         DynaBean result = MAPPER.readValue("{\"id\":2,\"name\":\"Joe\"}", DynaBean.class);
         assertEquals(2, result.id);
@@ -69,5 +78,11 @@ public class TestSerAnyGetter
     {
         String json = MAPPER.writeValueAsString(new PrivateThing());
         assertEquals("{\"a\":\"A\"}", json);
+    }
+    
+    public void testJsonAnySetter() throws Exception {
+    	JsonAnySetterOnMap result = MAPPER.readValue("{\"id\":2,\"name\":\"Joe\"}", JsonAnySetterOnMap.class);
+    	assertEquals(2, result.id);
+        assertEquals("Joe", result.other.get("name"));
     }
 }

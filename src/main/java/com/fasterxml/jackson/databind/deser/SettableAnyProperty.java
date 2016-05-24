@@ -1,10 +1,14 @@
 package com.fasterxml.jackson.databind.deser;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId.Referring;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
@@ -30,8 +34,8 @@ public class SettableAnyProperty
     /**
      * Annotated variant is needed for JDK serialization only
      */
-    final protected AnnotatedMethod _setter;
-
+    final protected AnnotatedMember _setter;
+    
     protected final JavaType _type;
 
     protected JsonDeserializer<Object> _valueDeserializer;
@@ -44,7 +48,7 @@ public class SettableAnyProperty
     /**********************************************************
      */
 
-    public SettableAnyProperty(BeanProperty property, AnnotatedMethod setter, JavaType type,
+    public SettableAnyProperty(BeanProperty property, AnnotatedMember setter, JavaType type,
             JsonDeserializer<Object> valueDeser, TypeDeserializer typeDeser)
     {
         _property = property;
@@ -53,7 +57,7 @@ public class SettableAnyProperty
         _valueDeserializer = valueDeser;
         _valueTypeDeserializer = typeDeser;
     }
-
+    
     public SettableAnyProperty withValueDeserializer(JsonDeserializer<Object> deser) {
         return new SettableAnyProperty(_property, _setter, _type,
                 deser, _valueTypeDeserializer);
@@ -142,7 +146,28 @@ public class SettableAnyProperty
     {
         try {
             // note: can not use 'setValue()' due to taking 2 args
-            _setter.getAnnotated().invoke(instance, propName, value);
+        	if(_setter instanceof AnnotatedMethod) {
+        		((AnnotatedMethod)_setter).getAnnotated().invoke(instance, propName, value);
+        	}
+        	//if annotation in the field (only map is supported now)
+        	else if(_setter instanceof AnnotatedField){
+        		AnnotatedField field = ((AnnotatedField)_setter);
+        		//check whether the annotated field is an instance of Map, if not throw Error
+        		if(!Map.class.isAssignableFrom(field.getRawType())){
+        			throw new IllegalArgumentException("Expecting a java.util.Map type in JsonAnySetter field, but got " + field.getRawType());
+        		}
+        		//get the field value, if null instantiate it..
+        		Object val = field.getValue(instance);
+        		if(val == null) {
+        			val = new HashMap();
+        		}
+        		
+        		//add the property key and value
+        		((Map)val).put(propName, value);
+        		
+        		//set the value back to the field
+        		field.setValue(instance, val);
+        	}
         } catch (Exception e) {
             _throwAsIOE(e, propName, value);
         }
